@@ -411,6 +411,9 @@ void slideHarris(int , void*) {
 			   corners.at(j).y <= corners.at(i).y+pad && corners.at(j).y >= corners.at(i).y-pad) {
 			   		//if the condition is met, erase the pixel
 			   		corners.erase(corners.begin() + j);
+					//decrement the j index: that's because we're still into the J for and we need to inform
+			   		//the cycle we decremented the index by erasing.
+			   		j--;
 			   }
 		}			
 	}

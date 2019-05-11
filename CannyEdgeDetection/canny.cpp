@@ -87,8 +87,6 @@ void Gaussian(Mat& kernel, double sigma) {
 
 }
 
-
-//Maybe its sobel the problem, maybe its the non-max supression.
 void Sobel(Mat padded_image, Mat& dest_image, Mat& gradient_orientations, int& max_intensity) {
 
 	//Declaring the Sobel X and Y matrix

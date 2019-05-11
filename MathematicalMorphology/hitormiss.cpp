@@ -41,7 +41,7 @@ int main(int argc, char** argv){
 	//This kernel B is the union of two kernel B1 and B2:
 	/*
 		|I F I|			|I I I|	   |I F I|
-	 B1 |F I F|  and B2 |I B I| -> |F B F|
+	     B1 |F I F|          and B2 |I B I| -> |F B F|
 		|I F I|			|I I I|    |I F I|
 	
 	This special pattern, will find all the background pixel contained in a Foreground region (B1).
@@ -49,15 +49,15 @@ int main(int argc, char** argv){
 	For example, a pattern to find the upper left angles of an object would be
 	
 		|B B I|			|I I I|    |B B I|
-	 B1 |B I I|  and B2 |I F F| -> |B F F|
+	     B1 |B I I|          and B2 |I F F| -> |B F F|
 		|I I I|			|I F I|	   |I F I|
 		
 
 	Example: if we're into a region area of an image A composed like this:
 	
-		        |B I B|										 |B B B|
+		    |B I B|					 |B B B|
 	region of A |B F F| and a structuring element like this: |B F F|
-			    |I F I|										 |I F I|
+		    |I F I|					 |I F I|
 			    
 	The central element of the image will be erased because it don't match the structuring element pattern
 	into the element A(0,1) (is I, while the structuring element (0,1) got B. Then the pixel A(centerX, centerY)

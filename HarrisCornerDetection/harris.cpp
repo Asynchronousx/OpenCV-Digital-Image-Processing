@@ -63,7 +63,7 @@ class EigenValue {
 int main(int argc, char** argv) {
 
 	if(argc!=3) {
-		cerr << "Usage: ./<programname> <imagename>.<format> <thresold>" << endl;
+		cerr << "Usage: ./<programname> <imagename.format> <thresold>" << endl;
 		exit(EXIT_FAILURE);
 	}
 	

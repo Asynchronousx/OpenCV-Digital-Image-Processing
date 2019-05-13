@@ -40,9 +40,9 @@ int main(int argc, char** argv){
 	//Let's indicate with F the foreground pixel, B the background and I the irrilevant ones.
 	//This kernel B is the union of two kernel B1 and B2:
 	/*
-		|I F I|			|I I I|	   |I F I|
-	     B1 |F I F|          and B2 |I B I| -> |F B F|
-		|I F I|			|I I I|    |I F I|
+		|I F I|			|I I I|	     |I F I|
+	     B1 |F I F|          and B2 |I B I| -> B |F B F|
+		|I F I|			|I I I|      |I F I|
 	
 	This special pattern, will find all the background pixel contained in a Foreground region (B1).
 	

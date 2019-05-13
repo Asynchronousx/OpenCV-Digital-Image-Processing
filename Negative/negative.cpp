@@ -21,7 +21,10 @@ int main(int argc, char** argv) {
 	
 	for(int i=0; i<image.rows; i++) {
 		for(int j=0; j<image.cols; j++) {
-			image.at<uchar>(i,j) = L - 1 - image.at<uchar>(i,j);		
+			//A negative of an image, is given by the formula:
+			//Negative I(u,v) = (L-1) - I(u,v), where L are the
+			//grayscale levels. (256)
+ 			image.at<uchar>(i,j) = L - 1 - image.at<uchar>(i,j);		
 		}
 	}
 	

@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
 	
 	//Before calling Hough, we need to apply a Gaussian Smoothing to the image, and find his edges with Canny.
 	//At every step, we're displaying the result.
-	GaussianBlur(raw_image, blurred_image, Size(5,5), 1.4, 0);
+	GaussianBlur(raw_image, blurred_image, Size(5,5), 1.4, 1.4);
 	imshow("Gaussian Blur", blurred_image);
 	Canny(blurred_image, edge_image, 60, 150, 3);
 	imshow("Canny Edge", edge_image);
@@ -93,8 +93,14 @@ void HoughTransformLine(Mat edge_image, Mat& dest_image) {
 	//This will be useful for accumulate the votes for each point valued from -pi to pi (-90 to 90) and a certain rho.
 	//We already have the Max value the lines (represented by rho) can be (max_distance).
 	//and also we know that the lines could vary from -90 to 90, so with 180 values max.
+	//Also, to take track of the rho in the finding of the polar coordinate, we must create a mechanism that permit us
+	//to know EXACTLY which rho was calculated at some point. To do this, at every compute of
+	//rho = xcos(theta) + ysin(theta), we'll add max_distance value to each rho to have a costant added tho this value.
+	//So, when we'll going to find the rho of each polar coordinate of the votes matrix, we'll just need to subtract the 
+	//max_distance to that rho to have the exact value. Let's create a matrix DOUBLE the size of max_distance for the rows
+	//that will hold all the values without any segmentation fault.
 	//Let's create the matrix with (max_distance, 180).
-	Mat votes = (Mat_<uchar>(max_distance, 180));
+	Mat votes = (Mat_<uchar>(max_distance*2, 180));
 	
 	//Populate the votes with 0
 	votes = Mat::zeros(votes.size(), CV_8U);
@@ -114,11 +120,11 @@ void HoughTransformLine(Mat edge_image, Mat& dest_image) {
 					//of a given point. Since we're analyzing the degree of a line for a given (x,y), we need to
 					//convert theta from degree to radiant. We can do this multiplying theta for PI/180.
 					//Note: the x and y are INVERTED into the geometric space. So our y is the x, and our x is the y.
-					rho = cvRound(y*cos(theta*RADCOEF) + x*sin(theta*RADCOEF));					
+					rho = cvRound((y*cos((theta-90)*RADCOEF) + x*sin((theta-90)*RADCOEF)) +max_distance);					
 
 					//Check: 0 < RHO < R*sqrt(2)? 
 					//If RHO is < 0 add max_distance to it. if is > than the max_distance, subtract from it.
-					rho = rho < 0? rho+max_distance: rho > max_distance? rho-max_distance: rho;
+				
 							
 					//vote for that point into the SP votes matrix
 					votes.at<uchar>(rho, theta)++;
@@ -153,8 +159,10 @@ void HoughTransformLine(Mat edge_image, Mat& dest_image) {
 				//Since the theta vary from 0-180, the rho associated with it is the index itself. 
 				//Also we need to take the theta as the angle of that specific line at that index: so we'll multiply the 
 				//theta for the radiant coefficient.
-				rho = r;
-				theta = t*RADCOEF;
+				//We also need to dispatch the current rho subtracting the max_distance to make it suitable again, and subtract
+				//90 from theta to let him be in the interval -90 / 90.
+				rho = r-max_distance;
+				theta = (t-90)*RADCOEF;
 				
 				//find the polar coordinate given rho and theta
 				FindPolar(rho, theta, P1, P2);
@@ -197,18 +205,3 @@ void FindPolar(double rho, double theta, Point& P1, Point& P2) {
 	P2.y = cvRound(y0 - 1000 * (cos(theta)));
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

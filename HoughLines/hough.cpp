@@ -120,12 +120,10 @@ void HoughTransformLine(Mat edge_image, Mat& dest_image) {
 					//of a given point. Since we're analyzing the degree of a line for a given (x,y), we need to
 					//convert theta from degree to radiant. We can do this multiplying theta for PI/180.
 					//Note: the x and y are INVERTED into the geometric space. So our y is the x, and our x is the y.
-					rho = cvRound((y*cos((theta-90)*RADCOEF) + x*sin((theta-90)*RADCOEF)) +max_distance);					
-
-					//Check: 0 < RHO < R*sqrt(2)? 
-					//If RHO is < 0 add max_distance to it. if is > than the max_distance, subtract from it.
-				
-							
+					//We also sum at every rho max_distance, which will be our constant to subtract in the polar conversion
+					//to find the right rho at every iteration.
+					rho = cvRound(y*cos((theta-90)*RADCOEF) + x*sin((theta-90)*RADCOEF)) + max_distance;					
+											
 					//vote for that point into the SP votes matrix
 					votes.at<uchar>(rho, theta)++;
 
@@ -161,8 +159,8 @@ void HoughTransformLine(Mat edge_image, Mat& dest_image) {
 				//theta for the radiant coefficient.
 				//We also need to dispatch the current rho subtracting the max_distance to make it suitable again, and subtract
 				//90 from theta to let him be in the interval -90 / 90.
-				rho = r-max_distance;
-				theta = (t-90)*RADCOEF;
+				rho = r - max_distance;
+				theta = (t-90) * RADCOEF;
 				
 				//find the polar coordinate given rho and theta
 				FindPolar(rho, theta, P1, P2);

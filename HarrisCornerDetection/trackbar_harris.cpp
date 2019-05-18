@@ -91,6 +91,10 @@ int main(int argc, char** argv) {
 	Mat dest_image = Mat::zeros(raw_image.rows, raw_image.cols, raw_image.type());
 	Mat padded_image;
 	
+		
+	//Colorful circles: convert to BGR
+	cvtColor(dest_image, dest_image, COLOR_GRAY2BGR);
+	
 	//Create a non-aggressive Gaussian Kernel with a proper sigma 
 	Mat kernel = (Mat_<double>(5,5));
 	

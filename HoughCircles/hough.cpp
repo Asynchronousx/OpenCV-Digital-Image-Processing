@@ -53,7 +53,7 @@ class CirclePoint {
 
 void HoughTransform(Mat, Mat&);
 
-//Global variables to use into hough algorithm
+//Global variables to take track of threshold
 int hough_threshold;
 int max_radius;
 int min_radius;

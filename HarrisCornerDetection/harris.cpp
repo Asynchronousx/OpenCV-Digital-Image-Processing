@@ -401,6 +401,10 @@ void harris(Mat raw_image, Mat kernel, Mat& dest_image, float upper_t) {
 	
 	//Copy the dest image and draw the circles
 	dest_image = raw_image.clone();
+	
+	//Colorful circles: convert to BGR
+	cvtColor(dest_image, dest_image, COLOR_GRAY2BGR);
+	
 	for(int i=0; i<corners.size(); i++) {
 		//Note: we must consider the Y first because Point(x,y) consider x as column and y as row.
 		Point center(cvRound(corners.at(i).y), cvRound(corners.at(i).x));

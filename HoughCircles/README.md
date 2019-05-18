@@ -1,4 +1,5 @@
-Important note: <b>Pre-Processing</b> with the Hough algorithms are important quite a lot. <br>
+#### Important note: Pre-Processing.
+Pre processing the images is quite a lot important with the Hough Algorithms. <br>
 For example, without a good threshold on Canny or without an histogram equalization we could have sometimes<br>
 worst result. Be careful on the Blur, Canny and other pre-processing threshold.<br>
 

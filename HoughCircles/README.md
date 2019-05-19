@@ -17,8 +17,13 @@ Coins image with Threshold of 170, min radius of 20 and max radius of 50<br>
 <br>
 
 #### Image 3
-Concentric circles withThreshold of 170, min radius fo 20 and max radius of 180 (Note: for the sake of the execution time,<br>
+Concentric circles with Threshold of 170, min radius fo 20 and max radius of 180 (Note: for the sake of the execution time,<br>
 multiple Hough iterations with smaller radius would be computationally faster.)<br>
 <img src="https://i.ibb.co/yycDmg1/conc.jpg" width="300">
 <img src="https://i.ibb.co/drkmm61/h3.png" width="300">
 <br>
+
+#### Image 3
+Non-Squared image with Threshold of 185, min radius of 20 and max radius of 80.
+<img src="https://i.ibb.co/vVyx9Cz/circles1.jpg" width="300">
+<img src="https://i.ibb.co/QQswB1L/Houhg.png" width="300">

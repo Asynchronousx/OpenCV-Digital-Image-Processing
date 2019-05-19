@@ -1,7 +1,7 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <math.h>
-#define RADCOEF CV_PI/180
+#define RADCOEF M_PI/180
 
 //Hough Transform: Circles
 //The hough transform algorithm is meant to find, given a source image and a certain threshold, 
@@ -81,7 +81,12 @@ int main(int argc, char** argv) {
 	Mat blur_image, edge_image;
 	Mat dest_image = raw_image.clone();
 
-	//Applying gaussian blur on the source and finding the edges with Canny
+	//Applying histogram equalization and gaussian blur on the source and finding the edges with Canny
+	//NOTE: histogram equalization is OPTIONAL, so play on this value if the blurred/canny values is not appropriate.
+	//also, the gaussian blur and the canny threshold values should change based on the image. 
+	//A safe approach to a good canny edge detection is the one showed below. 
+	//Non-aggressive gaussian blur with size of 5,5 and covariance of 1.5, and a Canny with threshold 80-150.
+	//equalizeHist is optional.
 	equalizeHist(raw_image, raw_image);
 	GaussianBlur(raw_image, blur_image, Size(5,5), 1.5, 1.5);
 	Canny(blur_image, edge_image, 80, 150, 3);
@@ -117,22 +122,29 @@ void HoughTransform(Mat edge_image, Mat& dest_image) {
 	//How we're going to init our matrix?
 	
 	//First, init a int pointer: we can use an array of three element declared inline.
-	//At the first value, we're going to set all the POSSIBLE values that float between min and max radius.
+	//We need three values to take track of all the possible combination of votes: the rows and cols of the image, and the radius numbers.
 	//For example, if min radius is 10 and max radius is 20, the possible analyzable elements are 11. (10...20 inclusive)
 	//So, (max radius - min radius) + 1 return exactly 11 possible radius to analyze in this specific case.
 	//We're going to pass rows and cols of the edged image to represent the space of the rows and the columns.
-	int values3D[] = {(max_radius-min_radius)+1, edge_image.rows+1, edge_image.cols+1};
+	//Important note: to build a CORRECT 3D MATRIX, we should need to pass values in descendet orders. 
+	//So, if rows are 100, cols 50 and radius 10, we should pass (rows, cols, radius) to make sure the program will not crash 
+	//during the computation.
+	//In this case, we'll approssimate the values from the biggest (rows) to the smallest (radius). 
+	//If cols are major than rows, by few hundreds unit, it's will not make any difference. The important is that radius goes to the end
+	//of this array, because it's the smallest of all three.
+	int values3D[] = {edge_image.rows, edge_image.cols, (max_radius-min_radius)+1};
 	
 	//Once done that, we're declaring a Mat object of 3 spaces (3D) composed by values3D fields. Each space
-	//will contain the right field. (Mat[0] -> Radius of dimension 10, Mat[1] -> Rows of dimension M, Mat[2] -> Cols of dimension N)
+	//will contain the right field. (Mat[0] -> Rows of dimension M, Mat[1] -> Cols of dimension N, Mat[2] -> Radius of dimension r)
+	//We create our 3D matrix and fill it with zeros.
 	Mat votes3D = Mat(3, values3D, IMREAD_GRAYSCALE, Scalar(0));
 	
 	//Also, initialize a 2D matrix to take track of the resultant votes image.
-	Mat votes = (Mat_<uchar>(edge_image.rows+1, edge_image.cols+1));
+	Mat votes = (Mat_<uchar>(edge_image.rows, edge_image.cols));
 	votes = Mat::zeros(votes.size(), votes.type());
 		
 	//Let's define our polar coordinate for the circle, a and b.
-	double a, b;
+	int a, b;
 
 	//For every pixel in the rows and the columns
 	for(int x=0; x<edge_image.rows; x++) {
@@ -140,7 +152,7 @@ void HoughTransform(Mat edge_image, Mat& dest_image) {
 			//if the current pixel is an edge pixel (or a good candidate to be one)
 			if(edge_image.at<uchar>(x,y) > 250) {
 				//for every possible radius, floating from min radius to max radius passed in input
-				for(int r=min_radius; r<=max_radius; r++) { 
+				for(int r=min_radius; r<max_radius; r++) { 
 					//for every possible theta for that specific pixel I(x,y)
 					for(int t=0; t<360; t++) {
 						
@@ -148,16 +160,23 @@ void HoughTransform(Mat edge_image, Mat& dest_image) {
 						//a = x - R*cos(theta), b = y - R*sin(theta).
 						//Dont forget to INVERT the coordinate to track the right point into the image, because an 
 						//image got x and y inverted.
-						a = cvRound(y - r*cos(t*RADCOEF));
-						b = cvRound(x - r*sin(t*RADCOEF));
+						//Example: an image with size of 780x430, means that is a rectangular image shape horizontal oriented.
+						//So, that means that there are 430 rows and 780 columns. That's why we're inverting the values, because
+						//we're treating the x as the columns and the y as the rows.
+						a = round(y - r*cos(t*RADCOEF));
+						b = round(x - r*sin(t*RADCOEF));
 						
-						//check the boundaries: if a or b exceed, skip this 
-						if(a > 0 && a < edge_image.rows && b > 0 && b < edge_image.cols) {
-							//update the 2D matrix at (a,b)
-							votes.at<uchar>(round(a), round(b))++;
+						//check the boundaries: if a or b exceed, skip this :
+						//Here, a represent the columns and b the rows. So be careful to confront those
+						//values with the appropriate size (rows or cols):
+						//since a is represented by the columns, we should compare a with the cols.
+						//b represent then the rows and we should confront b with the rows.
+						if(a >= 0 && a < edge_image.cols && b >= 0 && b < edge_image.rows) {
+							//update the 2D matrix at (rows,cols) -> (b,a)
+							votes.at<uchar>(b, a)++;
 							
-							//update the 3d matrix at current radius, a and b.
-							votes3D.at<uchar>(r,a,b)++;
+							//update the 3d matrix at current rows(b), columns(a) and radius(r).
+							votes3D.at<uchar>(b,a,r)++;
 						}
 					}				
 				}			
@@ -176,7 +195,7 @@ void HoughTransform(Mat edge_image, Mat& dest_image) {
 	vector<CirclePoint> circles;
 	
 	//starting by iterating every possible radius from min radius to max radius
-	for(int r=min_radius; r<=max_radius; r++) {
+	for(int r=min_radius; r<max_radius; r++) {
 		//for every pixel (x,y) into the image
 		for(int x=0; x<edge_image.rows; x++) {
 			for(int y=0; y<edge_image.cols; y++) {
@@ -187,13 +206,17 @@ void HoughTransform(Mat edge_image, Mat& dest_image) {
 				//Do not convert to polar coordinate (we can draw the circle with that coordinate, since the parameter space
 				//is equal to the size of the image space) and push back a new point into the circles vector, composed by
 				//the actual x, y and the radius analyzed.
-				if(votes3D.at<uchar>(r,x,y) >= hough_threshold) {
-					circles.push_back(CirclePoint(x,y,r));
+				if(votes3D.at<uchar>(x,y,r) >= hough_threshold) {
+			
+					//Note: since the image space is inverted, we should push the columns before the rows. 
+					//(That's why in the image property, the columns are represented first: i.e, the image of 780x430
+					//of the example above. Let's push then y, x and r to build the right coordinate of center and radius.
+					circles.push_back(CirclePoint(y,x,r));
+			
 				}
 			}
 		}
 	}
-	
 	
 	cout << "Possible circles found: " << circles.size() << endl;
 	

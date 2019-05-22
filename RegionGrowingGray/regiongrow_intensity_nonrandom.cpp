@@ -43,7 +43,7 @@ int t;
 int main(int argc, char** argv) {
 
 	if(argc != 4) {
-		cerr << "Usage: ./<programname> <image.format> <threshold> <regions>" << endl;
+		cerr << "Usage: ./<programname> <image.format> <threshold> <quality>" << endl;
 		exit(EXIT_FAILURE);
 	}
 	

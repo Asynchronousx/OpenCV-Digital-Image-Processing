@@ -5,7 +5,7 @@ This algorithm is implemented both with the analysis of the variance, that offer
 of the average for each region, and the analysis of the intensity, which will choose if a pixel belong or not to a region<br>
 based on the difference of the pixel intensity.<br><br>
 The image showed here are the output of a <b>random seed</b> approach. In this folder i also added a non-random approach that consist in the analysis of the first non-visited pixel at each iteration.<br>
-Note: the quality input paramter means the number of the iterations wanted * 1000. Also,<br>
+<br>Note: the quality input paramter means the number of the iterations wanted * 1000. Also,<br>
 Also, one pass of median filter is applied. More passing of median filter should result in a better image.<br>
 
 For the sake of the example, both are showed with their input, output and threshold values.

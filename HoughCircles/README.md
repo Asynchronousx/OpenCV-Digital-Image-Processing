@@ -24,6 +24,6 @@ multiple Hough iterations with smaller radius would be computationally faster.)<
 <br>
 
 #### Image 3
-Non-Squared image with Threshold of 185, min radius of 20 and max radius of 80.
+Non-Squared image with Threshold of 185, min radius of 20 and max radius of 80.<br>
 <img src="https://i.ibb.co/vVyx9Cz/circles1.jpg" width="300">
 <img src="https://i.ibb.co/QQswB1L/Houhg.png" width="300">

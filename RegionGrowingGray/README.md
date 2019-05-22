@@ -1,6 +1,6 @@
-##### Region Growing only for Grayscale
+##### Region Growing Grayscale
 
-A simple approach to the fundaments of the image segmentation, the region growing algorithm.<br>
+A simple approach to the fundaments of the image segmentation, the region growing algorithm for the grayscale images.<br>
 This algorithm is implemented both with the analysis of the variance, that offers a more complex approssimation<br>
 of the average for each region, and the analysis of the intensity, which will choose if a pixel belong or not to a region<br>
 based on the difference of the pixel intensity.<br>

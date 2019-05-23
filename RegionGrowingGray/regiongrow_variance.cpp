@@ -54,6 +54,9 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 	
+	//OPTIONAL: apply a smoothing filter to omogenize the regions into the image
+	GaussianBlur(raw_image, raw_image, Size(3,3), 1, 1);
+	
 	//Declaring our destination image.
 	Mat dest_image(raw_image.size(), raw_image.type(), Scalar(0));
 	

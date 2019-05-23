@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 	
 	Mat raw_image = imread(argv[1], IMREAD_GRAYSCALE);
 	
-	/*
+	/* Matrix test for RG algorithm
 	Mat raw_image = (Mat_<uchar>(5,5) << 
 	202, 201, 202, 102, 104,
 	200, 201, 205, 102, 101,
@@ -62,6 +62,9 @@ int main(int argc, char** argv) {
 		cerr << "Image format must be valid." << endl;
 		exit(EXIT_FAILURE);
 	}
+	
+	//OPTIONAL: apply a smoothing filter to omogenize the regions into the image
+	GaussianBlur(raw_image, raw_image, Size(3,3), 1, 1);
 	
 	//Declaring our destination image.
 	Mat dest_image(raw_image.size(), raw_image.type(), Scalar(0));

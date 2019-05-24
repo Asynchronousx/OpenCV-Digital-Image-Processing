@@ -61,19 +61,21 @@ int main(int argc, char** argv) {
 	Mat dest_image(raw_image.size(), raw_image.type(), Scalar(0));
 	
 	//Declaring the additional M matrix that represent the regions: same size of the input image, filled with 0.
-	//We declare this float because we need to take track only the region numbers.
-	Mat regions = dest_image.clone();
+	//We declare this float because we need to take track only the region numbers. 
+	//Important note: since the regions could be more than 255, it's a nice practice to initialize this matrix as a float one.
+	Mat regions(raw_image.size(), CV_32F, Scalar(0));
 	
-	//init the threshold and the posible regions
+	//init the threshold and the quality of the image: since the quality represent the iterations, we're going to mulitply
+	//the inserted value with 1000. (i.e: value = 10 -> 100.000 iterations)
 	t = atoi(argv[2]);
 	quality = atoi(argv[3])*1000;
-	
 	
 	//Region Growing algorithm: it need the input and output image, and the regions matrix.
 	RegionGrowing(raw_image, regions, dest_image);
 	
 	imshow("Original", raw_image);
 	imshow("Region Grow", dest_image);
+	imwrite("dest.png", dest_image);
 	waitKey(0);
 
 }
@@ -125,10 +127,10 @@ void RegionGrowing(Mat raw_image, Mat& regions, Mat& dest_image) {
 		//into a previous iteration, we don't need to analyze it because it was already done in the past. This is
 		//the necessary condition that allow us to skip useless iterations of the grow algorithm. 
 		//If regions(x,y) is not equal to zero, that means that the area starting at that seed is already drawn into the output image.
-		if(regions.at<uchar>(x_seed, y_seed) == 0) {
+		if(regions.at<float>(x_seed, y_seed) == 0) {
 			//If the pixel in the position (seed x, seed y) pass this test, that means that this pixel needs to be analyzed. So we didn't
 			//find a proper region linked to that specific pixel.
-			regions.at<uchar>(x_seed, y_seed) = current_region;
+			regions.at<float>(x_seed, y_seed) = current_region;
 			
 			//Fetching the pixel value at the seed position
 			pixel_value = raw_image.at<uchar>(x_seed, y_seed);
@@ -163,7 +165,7 @@ void RegionGrowing(Mat raw_image, Mat& regions, Mat& dest_image) {
 		for(int j=0; j<regions.cols; j++) {
 			//the i-th, j-th pixel of the dest image, is equal to the average of the region map (sum/pixelnumber) obtained with
 			//using the i-th, j-th pixel as the key for the hashmap to obtain that value for that specific region number.
-			dest_image.at<uchar>(i,j) = round(regionMap[regions.at<uchar>(i,j)].first/regionMap[regions.at<uchar>(i,j)].second);
+			dest_image.at<uchar>(i,j) = round(regionMap[regions.at<float>(i,j)].first/regionMap[regions.at<float>(i,j)].second);
 		}	
 	}
 	
@@ -208,10 +210,10 @@ void grow(vector<Point> pixelVector, map<int, pair<double, int>> regionMap, Mat 
 								
 					//If the variance of this pixel is contained into the threshold and the analyzed pixel has not been visited yet
 					//(region(x+u, y+v) marked as 0
-					if(variance < t && regions.at<uchar>(x+u, y+v) == 0) {
+					if(variance < t && regions.at<float>(x+u, y+v) == 0) {
 					
 						//Mark the pixel as visited with the current region passed in input
-						regions.at<uchar>(x+u, y+v) = region;
+						regions.at<float>(x+u, y+v) = region;
 						
 						//push the new pixel into the stack: we're going to analyze it later
 						pixelVector.push_back(Point(x+u, y+v));
@@ -231,7 +233,6 @@ void grow(vector<Point> pixelVector, map<int, pair<double, int>> regionMap, Mat 
 	}	
 	
 }
-
 
 
 

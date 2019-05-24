@@ -34,6 +34,8 @@
 using namespace std;
 using namespace cv;
 
+//Custom class that holds, for each region, the average value of a 3-channel pixel:
+//it holds the B, G, R average value and the number of pixel for that region.
 class Average3b {
 	public:
 	double b;

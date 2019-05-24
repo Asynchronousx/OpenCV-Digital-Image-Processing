@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 	
 	Mat raw_image = imread(argv[1], IMREAD_GRAYSCALE);
 	
-	/* Matrix test for RG algorithm
+	/*
 	Mat raw_image = (Mat_<uchar>(5,5) << 
 	202, 201, 202, 102, 104,
 	200, 201, 205, 102, 101,
@@ -63,15 +63,13 @@ int main(int argc, char** argv) {
 		exit(EXIT_FAILURE);
 	}
 	
-	//OPTIONAL: apply a smoothing filter to omogenize the regions into the image
-	GaussianBlur(raw_image, raw_image, Size(3,3), 1, 1);
-	
 	//Declaring our destination image.
 	Mat dest_image(raw_image.size(), raw_image.type(), Scalar(0));
 	
 	//Declaring the additional M matrix that represent the regions: same size of the input image, filled with 0.
-	//We declare this float because we need to take track only the region numbers.
-	Mat regions = dest_image.clone();
+	//We declare this float because we need to take track only the region numbers. 
+	//Important note: since the regions could be more than 255, it's a nice practice to initialize this matrix as a float one.
+	Mat regions(raw_image.size(), CV_32F, Scalar(0));
 	
 	//init the threshold
 	t = atoi(argv[2]);
@@ -114,7 +112,7 @@ void RegionGrowing(Mat raw_image, Mat& regions, Mat& dest_image) {
 		//all the possibles seed.
 		for(int x=0; x<raw_image.rows; x++) {
 			for(int y=0; y<raw_image.cols; y++) {
-				if(regions.at<uchar>(x,y) == 0) {
+				if(regions.at<float>(x,y) == 0) {
 					x_seed = x;
 					y_seed = y;
 				} 
@@ -127,7 +125,7 @@ void RegionGrowing(Mat raw_image, Mat& regions, Mat& dest_image) {
 		//Since we're here, that means that there isn't an analyzed pixel in the coordinate
 		//(seed x, seed y) of the region matrix. That means that we can expand this pixel and find his entire region.
 		//We mark it as visited so it will be not be considered into the growing algorithm.
-		regions.at<uchar>(x_seed, y_seed) = 1;
+		regions.at<float>(x_seed, y_seed) = 1;
 			
 		//Assigning the pixel of the image at (x seed, y seed) to a pixel value variable, that will be useful to find all the
 		//pixel with similar intensity to this one, that represent the first seed of the current region.
@@ -193,10 +191,10 @@ void grow(vector<Point> pixelVector, Mat raw, Mat& regions, Mat& dest, int pixel
 					//we can assure that the current pixel belong to that region. 
 					//If is BIGGER than the threshold, we know for sure that the pixel should not belong to that region because differs too much.
 					//We also check that the current pixel has not been analyzed yet (region(current pixel) == 0)
-					if(abs(pixel_value - raw.at<uchar>(x+u, y+v)) < t && regions.at<uchar>(x+u, y+v) == 0) {
+					if(abs(pixel_value - raw.at<uchar>(x+u, y+v)) < t && regions.at<float>(x+u, y+v) == 0) {
 					
 						//We mark the pixel as visited
-						regions.at<uchar>(x+u, y+v) = 1;
+						regions.at<float>(x+u, y+v) = 1;
 						
 						//Assign to the current pixel the intensity of the seed pixel that represent the region (approssimating the value of the region itself)
 						dest.at<uchar>(x+u, y+v) = pixel_value;	

@@ -266,26 +266,3 @@ void KMean(Mat raw_image, Mat& dest_image, int clusters_num, int iterations, int
 	medianBlur(dest_image, dest_image, 3);
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

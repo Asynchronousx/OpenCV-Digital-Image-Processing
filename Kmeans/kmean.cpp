@@ -121,12 +121,12 @@ class Cluster {
 };
 
 
-void KMean(Mat, Mat&, int, int, int);
+void KMean(Mat, Mat&, int, int);
 
 int main(int argc, char** argv) {
 
-	if(argc!=5) {
-		cerr << "Usage: ./<programname> <image.format> <K cluster> <Max Iterations> <Threshold>" << endl;
+	if(argc!=4) { //5 if you want to use the threshold
+		cerr << "Usage: ./<programname> <image.format> <K cluster> <Max Iterations>" << endl;
 		exit(EXIT_FAILURE); 	
 	}
 	
@@ -143,10 +143,10 @@ int main(int argc, char** argv) {
 	//Assigning k cluster and iterations max
 	int clusters_num = atoi(argv[2]);
 	int iterations = atoi(argv[3]);
-	int t = atoi(argv[4]);
+	//int t = atoi(argv[4]);
 	
 	//Calling K-Mean
-	KMean(raw_image, dest_image, clusters_num, iterations, t);
+	KMean(raw_image, dest_image, clusters_num, iterations /*, t*/);
 	
 	imshow("Original", raw_image);
 	imshow("K-Means", dest_image);
@@ -155,7 +155,7 @@ int main(int argc, char** argv) {
 
 }
 
-void KMean(Mat raw_image, Mat& dest_image, int clusters_num, int iterations, int t) {
+void KMean(Mat raw_image, Mat& dest_image, int clusters_num, int iterations /*, int t*/) {
 
 	//Declarations of a vector of cluster to take track of the changing of the image
 	vector<Cluster> clusters;
@@ -176,22 +176,46 @@ void KMean(Mat raw_image, Mat& dest_image, int clusters_num, int iterations, int
 	//thats because, we can do a fixed number of iterations: if for some reason the algorithm should
 	//converge because it's centroid do not vary anymore, we break the for and proceed to 
 	for(int i=0; i<iterations; i++) {
+				
+		//at each iteration, we re-initialize some variable such at the distance and the index, 
+		//that will help us find the cluster minimum threshold and the index at for every iteration.
+		float distance;
+		int index;
+		
+		//Note: sometimes, an approssimation with a threshold passed in input by the user could work
+		//better than the automatic threshold passed in input. An example is found at the end
+		//of the file. Replace the following for with the for at the end of the page if you want to check
+		//the approssimated results.
 		
 		//Let's start analyzing every single pixel of the image to choose to which cluster they belong:
 		//iterate through the image
-		
 		for(int	x=0; x<raw_image.rows; x++) {
 			for(int y=0; y<raw_image.cols; y++) {
 				//Now, for a generic (x,y) pixel, let's discover to which cluster the pixel belong:
 				//We iterate through the clust vector and check if the distance between the pixel and the 
-				//centroid is lesser than a threshold: if so, add the pixel to the k-th cluster and break the
-				//cycle (because we want to assign one pixel to only one cluster).
+				//centroid is lesser than a threshold: if so, mark the current k index as a potential index
+				//for a cluster, and update the minimum distance found with the current distance. If no 
+				//pixel distance will be lesser than this new distance, the cluster at k will be choosen to
+				//host the pixel.
+				float min_dist = FLT_MAX;
+				
+				//For all the cluster
 				for(int k=0; k<clusters.size(); k++) {
-					if(norm(raw_image.at<Vec3b>(x,y), clusters.at(k).centroid) < t) {
-						clusters.at(k).add_pixel(raw_image.at<Vec3b>(x,y), x, y);
-						break;
-					}				
+					//getting the distance
+					distance = norm(raw_image.at<Vec3b>(x,y), clusters.at(k).centroid); 
+					//check
+					if(distance < min_dist) {
+						//update the index and the minimum distance found
+						index = k;
+						min_dist = distance;						
+					}
 				}
+				
+				//When all the iterations are done, we know for sure to which cluster the pixel belong.
+				//so we use the index that memorized the optimal cluster to push the pixel into that cluster
+				//pixels vector.
+				clusters.at(index).add_pixel(raw_image.at<Vec3b>(x,y), x, y);
+				
 			}
 		}
 		
@@ -270,22 +294,23 @@ void KMean(Mat raw_image, Mat& dest_image, int clusters_num, int iterations, int
 
 
 
+/*
+	Example of approssimation of the threshold, t passed by the user and insert and break
+	if found a possible cluster
 
+for(int	x=0; x<raw_image.rows; x++) {
+	for(int y=0; y<raw_image.cols; y++) {
+		//Now, for a generic (x,y) pixel, let's discover to which cluster the pixel belong:
+		//We iterate through the clust vector and check if the distance between the pixel and the 
+		//centroid is lesser than a threshold: if so, add the pixel to the k-th cluster and break the
+		//cycle (because we want to assign one pixel to only one cluster).
+		for(int k=0; k<clusters.size(); k++) {
+		if(norm(raw_image.at<Vec3b>(x,y), clusters.at(k).centroid) < t) {
+			clusters.at(k).add_pixel(raw_image.at<Vec3b>(x,y), x, y);
+			break;
+			}				
+		}
+	}
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+*/

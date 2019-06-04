@@ -35,7 +35,7 @@ using namespace cv;
 
 //Class useful to take track of the average of the region.
 class Average3b {
-
+	
 	public:
 	int b;
 	int g;

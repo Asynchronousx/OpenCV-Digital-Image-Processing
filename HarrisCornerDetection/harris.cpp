@@ -321,9 +321,9 @@ void harris(Mat raw_image, Mat kernel, Mat& dest_image, float upper_t) {
 					//Second element is the product of DX x DY
 					M.at<float>(0,1) += DX.at<uchar>(i-pad+u, j-pad+v) * DY.at<uchar>(i-pad+u, j-pad+v);
 					//Third element is again the product of DX x DY
-					M.at<float>(1,1) += DX.at<uchar>(i-pad+u, j-pad+v) * DY.at<uchar>(i-pad+u, j-pad+v);
+					M.at<float>(1,0) += DX.at<uchar>(i-pad+u, j-pad+v) * DY.at<uchar>(i-pad+u, j-pad+v);
 					//Last element is Derivate Y squared
-					M.at<float>(1,0) += pow(DX.at<uchar>(i-pad+u, j-pad+v), 2);
+					M.at<float>(1,1) += pow(DX.at<uchar>(i-pad+u, j-pad+v), 2);
 				}
 			}
 			

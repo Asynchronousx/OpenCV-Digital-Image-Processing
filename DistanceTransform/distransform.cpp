@@ -55,6 +55,7 @@ int main(int argc, char** argv) {
 	//The standard used in this algorithm is BLACK for the background and WHITE for
 	//the actual object.
 	threshold(raw_image, binary_image4, 127, 255, THRESH_BINARY /*| THRESH_OTSU */ );
+
 	binary_image8 = binary_image4.clone();
 	
 	imshow("Binary Image", binary_image4);
@@ -89,6 +90,8 @@ int main(int argc, char** argv) {
 	
 	imshow("DT 4-Conn", dest_image4);
 	imshow("DT 8-Conn", dest_image8);
+	imwrite("4.png", dest_image4);
+	imwrite("8.png", dest_image8);
 	waitKey(0);
 	return 0;
 
@@ -110,10 +113,11 @@ void DistanceTransform4(Mat binary_image, Mat& dest_image) {
 			if(binary_image.at<uchar>(i,j) != 0) {
 				//Take the left and upper pixel
 				int N = binary_image.at<uchar>(i-1, j);
-				int E = binary_image.at<uchar>(i, j-1);
+				int W = binary_image.at<uchar>(i, j-1);
+
 				//having the already analyzed neighbourhood, take the min between them and add
 				//1 to set the increased distance.
-				binary_image.at<uchar>(i,j) = 1 + min(N,E);
+				binary_image.at<uchar>(i,j) = 1 + min(N,W);
 			}
 		}
 	}
@@ -130,16 +134,16 @@ void DistanceTransform4(Mat binary_image, Mat& dest_image) {
 				//Because we're analyzing the distance from the background from right to left, bottom to up.
 				//Taking all the pixel in all the direction would be useless and produce the same exact result.
 				int S = binary_image.at<uchar>(i+1, j);
-				int W = binary_image.at<uchar>(i, j+1);
+				int E = binary_image.at<uchar>(i, j+1);
 			
 				//Increment those pixel by one
 				S++;
-				W++;
+				E++;
 		
 				//taking the min between those pixel and the current pixel, and putting that
 				//into the binary image itself: that's because in the next iteration, we will
 				//analyze the corrected pixel at an i-th step.
-				binary_image.at<uchar>(i,j) = min((int)binary_image.at<uchar>(i,j), min(S,W));
+				binary_image.at<uchar>(i,j) = min((int)binary_image.at<uchar>(i,j), min(S,E));
 			}
 		}
 	}
@@ -154,19 +158,20 @@ void DistanceTransform8(Mat binary_image, Mat& dest_image) {
 
 	//As for the 4-Connectivity, the logic is the same: we must do two scanning,
 	//left to right up to bottom, and bottom to up, right to left.
-	//In the 8-Connectivity we must consider all the 
+	//In the 8-Connectivity we must consider the top-left pixels when iterating from left to right up to bottom.
+	//We start at 1 to avoid padding
 	for(int i=1; i<binary_image.rows; i++) {
 		for(int j=1; j<binary_image.cols; j++) {
 			//If the current pixel isn't a background pixel
 			if(binary_image.at<uchar>(i,j) != 0) {
 				//In the 8-Conn we need to extract 4 pixels: left, upper left, upper and upper right.
-				int E = binary_image.at<uchar>(i, j-1);
-				int NE = binary_image.at<uchar>(i-1, j-1);
+				int W = binary_image.at<uchar>(i, j-1);
+				int NW = binary_image.at<uchar>(i-1, j-1);
 				int N = binary_image.at<uchar>(i-1, j);
-				int NW = binary_image.at<uchar>(i-1, j+1);
+				int NE = binary_image.at<uchar>(i-1, j+1);
 				
 				//Now we need to take the min between those four: 
-				int m = min(min(E,NE), min(N,NW));
+				int m = min(min(W,NW), min(N,NE));
 				
 				//put this pixel into the current index and increment by one, to set and
 				//memorize the incremented distance.
@@ -183,19 +188,19 @@ void DistanceTransform8(Mat binary_image, Mat& dest_image) {
 				//Again, we need to take 4 pixel: bottom left, bottom, bottom right, right
 				//for the same reason of the second scanning of the 4-conn.
 				//We also must increment them by one.
-				int SE = binary_image.at<uchar>(i+1, j-1);
+				int SE = binary_image.at<uchar>(i+1, j+1);
 				int S = binary_image.at<uchar>(i+1, j);
-				int SW = binary_image.at<uchar>(i+1, j+1);
-				int W = binary_image.at<uchar>(i,j+1);
+				int SW = binary_image.at<uchar>(i+1, j-1);
+				int E = binary_image.at<uchar>(i,j+1);
 				
 				//increment them by one to remember the distance
 				SE++;
 				S++;
 				SW++;
-				W++;
+				E++;
 				
 				//take the min between them 
-				int m = min(min(SE,S), min(SW,W));
+				int m = min(min(SE,S), min(SW,E));
 				
 				//confront the min with the current pixel and choose the min
 				binary_image.at<uchar>(i,j) = min((int)binary_image.at<uchar>(i,j), m);

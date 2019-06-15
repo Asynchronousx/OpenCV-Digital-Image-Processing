@@ -56,7 +56,40 @@ int main(int argc, char** argv) {
 	//the actual object.
 	threshold(raw_image, binary_image4, 127, 255, THRESH_BINARY /*| THRESH_OTSU */ );
 
+	/*
+	// split and suppress blue channel for piramid image
+	Mat bgr[3];
+	
+	split(raw_image, bgr);
+	
+	imshow("b", bgr[0]);
+	imshow("g", bgr[1]);
+	imshow("r", bgr[2]);
+	waitKey(0);
+	
+	threshold(bgr[0], bgr[0], 160, 255, THRESH_BINARY_INV);
+	morphologyEx(bgr[0], bgr[0], MORPH_OPEN, Mat());
+	
+	//bgr[0] = 255 - bgr[0];
+	
+	imshow("bt", bgr[0]);
+	waitKey(0);
+		
+	binary_image4 = bgr[0];
+	
+	
+	*/
 	binary_image8 = binary_image4.clone();
+	
+	/*
+	bitwise_and(raw_image, raw_image, binary_image8, binary_image4);
+	imshow("a", binary_image8);
+	binary_image4 = 255 - binary_image4;
+	imshow("b", binary_image4);
+	morphologyEx(binary_image4, binary_image4, MORPH_OPEN, Mat(), Point(-1, -1), 3);
+	binary_image4 = 255 - binary_image4;
+	imshow("c", binary_image43);
+	*/
 	
 	imshow("Binary Image", binary_image4);
 	waitKey(0);
@@ -136,14 +169,13 @@ void DistanceTransform4(Mat binary_image, Mat& dest_image) {
 				int S = binary_image.at<uchar>(i+1, j);
 				int E = binary_image.at<uchar>(i, j+1);
 			
-				//Increment those pixel by one
-				S++;
-				E++;
-		
+
 				//taking the min between those pixel and the current pixel, and putting that
 				//into the binary image itself: that's because in the next iteration, we will
-				//analyze the corrected pixel at an i-th step.
-				binary_image.at<uchar>(i,j) = min((int)binary_image.at<uchar>(i,j), min(S,E));
+				//analyze the corrected pixel at an i-th step. We also add 1 to remember the distance
+				//from the background.
+				//We also need the (int) cast on the uchar binary image because min takes in input two int.
+				binary_image.at<uchar>(i,j) = 1 + min((int)binary_image.at<uchar>(i,j), min(S,E));
 			}
 		}
 	}
@@ -170,12 +202,9 @@ void DistanceTransform8(Mat binary_image, Mat& dest_image) {
 				int N = binary_image.at<uchar>(i-1, j);
 				int NE = binary_image.at<uchar>(i-1, j+1);
 				
-				//Now we need to take the min between those four: 
-				int m = min(min(W,NW), min(N,NE));
-				
-				//put this pixel into the current index and increment by one, to set and
+				//Choose the minimum pixel between W, NW, N, NE into the current index and increment by one, to set and
 				//memorize the incremented distance.
-				binary_image.at<uchar>(i,j) = m + 1;
+				binary_image.at<uchar>(i,j) = 1 +  min(min(W,NW), min(N,NE));
 			}
 		}
 	}
@@ -193,17 +222,13 @@ void DistanceTransform8(Mat binary_image, Mat& dest_image) {
 				int SW = binary_image.at<uchar>(i+1, j-1);
 				int E = binary_image.at<uchar>(i,j+1);
 				
-				//increment them by one to remember the distance
-				SE++;
-				S++;
-				SW++;
-				E++;
-				
 				//take the min between them 
 				int m = min(min(SE,S), min(SW,E));
 				
-				//confront the min with the current pixel and choose the min
-				binary_image.at<uchar>(i,j) = min((int)binary_image.at<uchar>(i,j), m);
+				//confront the min with the current pixel and choose the min.  We also add 1 to remember the distance
+				//from the background.
+				//We also need the (int) cast on the uchar binary image because min takes in input two int.
+				binary_image.at<uchar>(i,j) = 1 + min((int)binary_image.at<uchar>(i,j), m);
 			}
 		}
 	}

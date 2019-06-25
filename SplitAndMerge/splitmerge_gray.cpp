@@ -107,8 +107,8 @@ void SplitAndMerge(Mat, Mat&);
 void split(int, int, int, int);
 void calculate_adjacency();
 void merge();
-void build_image(Mat&);
-void build_split_image(Mat&);
+void build_image_rect(Mat&);
+void build_image_norect(Mat&);
 
 //Defining a vector of regions and the threshold
 vector<Region> regions;
@@ -166,7 +166,9 @@ int main(int argc, char** argv) {
 void SplitAndMerge(Mat raw_image, Mat& dest_image) {
 	
 	//Split dest is our intermediate image: it will show the segmentation producted by the splitting of the image itself.
-	Mat split_dest = dest_image.clone();
+	Mat dest_split = dest_image.clone();
+	Mat dest_split_rect = dest_image.clone();
+	Mat dest_image_rect = dest_image.clone();
 	
 	//Fetching the coordinate of the first region: initially, it's the whole image.
 	//We're subtracting 1 because we're starting from 0.
@@ -179,8 +181,11 @@ void SplitAndMerge(Mat raw_image, Mat& dest_image) {
 	split(0, rows, 0, cols);
 	
 	//Build the splitted image and display it
-	build_split_image(split_dest);
-	imshow("Splitted Image", split_dest);
+	build_image_norect(dest_split);
+	build_image_rect(dest_split_rect);
+	imshow("Splitted Image No Rect", dest_split);
+	imshow("Splitted Image Rect", dest_split_rect);
+	waitKey(0);
 	
 	//Set the adjacency for all the region
 	calculate_adjacency();
@@ -190,7 +195,16 @@ void SplitAndMerge(Mat raw_image, Mat& dest_image) {
 	
 	//After the merging, the new average value are present in each regions. 
 	//Let's re-build our image.
-	build_image(dest_image);
+	//build again to display in the main
+	build_image_rect(dest_image_rect);
+	build_image_norect(dest_image);
+	
+	//showing the images
+	imshow("Split&Merge No Rect", dest_image);
+	imshow("Split&Merge Rect", dest_image_rect);
+	
+	imwrite("out1.png", dest_image);
+	imwrite("out2.png", dest_image_rect);
 	
 }
 
@@ -381,17 +395,17 @@ void merge() {
 }
 
 
-void build_image(Mat& output) {
+void build_image_rect(Mat& output) {
 
 	
     //For each region in the regions vector
     for(int k=0; k<regions.size(); k++) {
     	//Starting at the beginning row of the region (y because rect store x and y inverted into his structure, and height
     	//that represent the end row of the region)    	
-        for(int i=regions.at(k).area.y; i<=regions.at(k).area.height; i++) {
+        for(int i=regions.at(k).area.y; i<regions.at(k).area.height; i++) {
         	//Starting at the beginning col of the region (x because rect store x and y inverted into his structure, and width
         	//that represent the end col of the region)
-            for(int j=regions.at(k).area.x; j<=regions.at(k).area.width; j++) {
+            for(int j=regions.at(k).area.x; j<regions.at(k).area.width; j++) {
             	//Assign to the output image the average of that region.
                 output.at<uchar>(i,j) = regions.at(k).average;
             }
@@ -400,7 +414,7 @@ void build_image(Mat& output) {
           
 }
 
-void build_split_image(Mat& output) {
+void build_image_norect(Mat& output) {
 
 	
     //For each region in the regions vector
@@ -420,55 +434,3 @@ void build_split_image(Mat& output) {
     public_image = output;
        
 }
-
-
-/* Test for checking the region 
-
-			cout << "Region SR: " << analyzed.area.y << " Region SC: " << analyzed.area.x << " Region ER: " << analyzed.area.height << " Region EC: " << analyzed.area.width << " Region Pixel: " << analyzed.pixel_num<< "Region C: " << c << " Dist: " << distance << endl;
-			
-			cout << "Extracted SR: " << extracted.area.y << " Extracted SC: " << extracted.area.x << " Extracted ER: " << extracted.area.height << " Extracted EC: " << extracted.area.width << " Extracted Pixel: " << extracted.pixel_num << endl;
-			
-			cout << "N: " << N << endl;
-			cout << "E: " << E << endl;
-			cout << "S: " << S << endl;
-			cout << "W: " << W << endl;
-			cout << "Extracted contains N: " << extracted.contains(N) << endl;
-			cout << "Extracted contains E: " << extracted.contains(E) << endl;
-			cout << "Extracted contains S: " << extracted.contains(S) << endl;
-			cout << "Extracted contains W: " << extracted.contains(W) << endl;
-			getchar();
-*/
-
-/* Test for checking the adjacence
-
-		for(int x=0; x<regions.size(); x++) {
-		cout << "Region SR: " << regions.at(x).area.y << " Region SC: " << regions.at(x).area.x << " Region ER: " << regions.at(x).area.height << " Region EC: " << regions.at(x).area.width << " Neighbours: " << regions.at(x).adjacency.size() << endl;	
-		
-		if(regions.at(x).area.y == 0 && regions.at(x).area.x == 0) {
-			circle(public_image, Point(regions.at(x).area.x, regions.at(x).area.y), 3, Scalar(0,255,0));
-			circle(public_image, Point(regions.at(x).area.width, regions.at(x).area.height), 3, Scalar(0,255,0));
-			for(auto n: regions.at(x).adjacency) {
-				circle(public_image, Point(n->area.x, n->area.y), 3, Scalar(0,255,0));
-				circle(public_image, Point(n->area.width, n->area.height), 3, Scalar(0,255,0));			
-			}
-		}
-	}
-	imshow("P", public_image);
-	waitKey(0);
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

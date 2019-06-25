@@ -344,10 +344,10 @@ void slideHarris(int , void*) {
 					M.at<float>(0,0) += pow(public_DX.at<uchar>(i-pad+u, j-pad+v), 2);
 					//Second element is the product of DX x DY
 					M.at<float>(0,1) += public_DX.at<uchar>(i-pad+u, j-pad+v) * public_DY.at<uchar>(i-pad+u, j-pad+v);
-					//Third element is the derivate Y squared
-					M.at<float>(1,0) += pow(public_DX.at<uchar>(i-pad+u, j-pad+v), 2);
-					//Again, last element is the product of DX x DY
-					M.at<float>(1,1) += public_DX.at<uchar>(i-pad+u, j-pad+v) * public_DY.at<uchar>(i-pad+u, j-pad+v);
+					//Third element is again the product of DX x DY
+					M.at<float>(1,0) += DX.at<uchar>(i-pad+u, j-pad+v) * DY.at<uchar>(i-pad+u, j-pad+v);
+					//Last element is Derivate Y squared
+					M.at<float>(1,1) += pow(DX.at<uchar>(i-pad+u, j-pad+v), 2);
 				}
 			}
 			

@@ -6,7 +6,7 @@ and images with large sizes.<br>
 ### Image 1
 Apples on grass, 2 clusters found with 10 histogram threshold<br>
 <img src="https://i.ibb.co/v1S6KmH/1.jpg" width="300">
-<img src="https://i.ibb.co/v1S6KmH/1.jpg" width="300">
+<img src="https://i.ibb.co/n8wKGrb/output.png" width="300">
 
 ### Image 2
 Apples on yellow background, 8 clusters found with 40 histogram threshold<br>

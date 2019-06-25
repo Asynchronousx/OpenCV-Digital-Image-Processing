@@ -1,4 +1,4 @@
-Simple example of Split & Merge Algorithm for image segmentation through regions.<br>
+Simple example of Split & Merge RGB Version Algorithm for image segmentation through regions.<br>
 
 # Result
 ### Image 1

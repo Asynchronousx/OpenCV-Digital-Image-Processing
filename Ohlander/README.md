@@ -1,6 +1,6 @@
 Simple example of Ohlander Algorithm for image clustering.<br>
 Known Bug: The algorithm sometimes does not converge (infinite loop) with very coloured and detailed images,<br>
-and images with large sizes.<br>
+and images with large sizes. If the algorithm does not show *istantly* the solution, try running with an higher threshold.<br>
 
 # Result
 ### Image 1

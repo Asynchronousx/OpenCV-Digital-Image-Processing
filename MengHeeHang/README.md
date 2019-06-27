@@ -2,7 +2,7 @@ Simple example of Meng-Hee Heng K-Means variant Algorithm for image clustering.<
 The peculiarity of this algorithm is that will find automatically all the clusters present into the image,<br>
 with no need of any kind of thresholding or clusters number.<br>
 
-# Result
+# Results
 ### Image 1
 Football players, 4 clusters found with 3 iterations<br>
 <img src="https://i.ibb.co/j5gGYxt/f.png" width="300">

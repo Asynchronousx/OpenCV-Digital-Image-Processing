@@ -1,6 +1,6 @@
 Simple example of Split & Merge RGB Version Algorithm for image segmentation through regions.<br>
 
-# Result
+# Results
 ### Image 1
 NY city with 50 euclidean distance threshold and 25 minimum square size<br>
 <img src="https://i.ibb.co/YTsQjvJ/ny.jpg" width="300">

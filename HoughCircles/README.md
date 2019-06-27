@@ -3,7 +3,7 @@ Pre processing the images is quite a lot important with the Hough Algorithms. <b
 For example, without a good threshold on Canny or without an histogram equalization we could have sometimes<br>
 worst result. Be careful on the Blur, Canny and other pre-processing threshold.<br>
 
-Some samples of circle recognition with my Hough implementation:
+#Results
 #### Image 1
 OpenCV image with Threshold of 160, min radius of 20 and max radius of 60<br>
 <img src="https://i.ibb.co/pvXVXdR/ocv.png" width="300">

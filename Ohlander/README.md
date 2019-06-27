@@ -2,7 +2,7 @@ Simple example of Ohlander Algorithm for image clustering.<br>
 Known Bug: The algorithm sometimes does not converge (infinite loop) with very coloured and detailed images,<br>
 and images with large sizes. If the algorithm does not show *istantly* the solution, try running with an higher threshold.<br>
 
-# Result
+# Results
 ### Image 1
 Apples on grass, 2 clusters found with 10 histogram threshold<br>
 <img src="https://i.ibb.co/v1S6KmH/1.jpg" width="300">

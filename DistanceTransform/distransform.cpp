@@ -55,41 +55,8 @@ int main(int argc, char** argv) {
 	//The standard used in this algorithm is BLACK for the background and WHITE for
 	//the actual object.
 	threshold(raw_image, binary_image4, 127, 255, THRESH_BINARY /*| THRESH_OTSU */ );
-
-	/*
-	// split and suppress blue channel for piramid image
-	Mat bgr[3];
 	
-	split(raw_image, bgr);
-	
-	imshow("b", bgr[0]);
-	imshow("g", bgr[1]);
-	imshow("r", bgr[2]);
-	waitKey(0);
-	
-	threshold(bgr[0], bgr[0], 160, 255, THRESH_BINARY_INV);
-	morphologyEx(bgr[0], bgr[0], MORPH_OPEN, Mat());
-	
-	//bgr[0] = 255 - bgr[0];
-	
-	imshow("bt", bgr[0]);
-	waitKey(0);
-		
-	binary_image4 = bgr[0];
-	
-	
-	*/
 	binary_image8 = binary_image4.clone();
-	
-	/*
-	bitwise_and(raw_image, raw_image, binary_image8, binary_image4);
-	imshow("a", binary_image8);
-	binary_image4 = 255 - binary_image4;
-	imshow("b", binary_image4);
-	morphologyEx(binary_image4, binary_image4, MORPH_OPEN, Mat(), Point(-1, -1), 3);
-	binary_image4 = 255 - binary_image4;
-	imshow("c", binary_image43);
-	*/
 	
 	imshow("Binary Image", binary_image4);
 	waitKey(0);

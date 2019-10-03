@@ -51,6 +51,7 @@ void PrintMat(Mat mat) {
 
 }
 
+//Note: Gaussian filter is commented in the apposite folder in this Repo. For further information, check the implementation from scratch.
 void Gaussian(Mat& kernel, double sigma) {
 
 	double sum = 0.0;
@@ -87,6 +88,8 @@ void Gaussian(Mat& kernel, double sigma) {
 
 }
 
+//Note: Sobel and differential filtering are commented in the apposite folders in this Repo. 
+//For further information, check the implementation from scratch of those.
 void Sobel(Mat padded_image, Mat& dest_image, Mat& gradient_orientations, int& max_intensity) {
 
 	//Declaring the Sobel X and Y matrix
